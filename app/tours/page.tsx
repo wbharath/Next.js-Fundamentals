@@ -50,3 +50,18 @@ async function ToursPage() {
 }
 
 export default ToursPage
+
+// to be remembered
+{/* Private Folders _folder
+
+Route Groups (dashboard)
+
+Dynamic Routes
+
+[...folder] - Catch-all route segment
+[[...folder]] Optional catch-all route segment (used by Clerk)
+create test folder app/_css
+
+create app/(dashboard)/auth
+
+the url is just '/auth'*/}
