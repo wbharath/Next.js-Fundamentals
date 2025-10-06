@@ -1,5 +1,6 @@
 'use server'
 
+import { error, log } from 'console'
 import { readFile, writeFile } from 'fs/promises'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -9,31 +10,37 @@ type User = {
   lastName: string
 }
 
-export const createUser = async (formData: FormData) => {
+// when we use useFormState our server action must accept 2 parameters. 1.Initial state and 2.formData
+// without useFormState action only gets formData
+export const createUser = async (prevState: any, formData: FormData) => {
   'use server'
+  console.log(prevState)
+
+  await new Promise((resolve) => setTimeout(resolve, 3000))
   const firstName = formData.get('firstName') as string
   const lastName = formData.get('lastName') as string
   const newUser: User = { firstName, lastName, id: Date.now().toString() }
-
 
   //  const rawData = Object.fromEntries(formData)
   // does the same thing as above two lines. We cna just use Object.entries (JS function)
   //  console.log({firstName, lastName})
 
-
-  await saveUser(newUser)
+  // await saveUser(newUser)
   // revalidatePath('/actions')
   // redirect('/') redirect('/actions) work as well
 
   // if you place redirect here. It will throw an error. Just place it after catch block
-  // try {
-  //   await saveUser(newUser)
-  // redirect('/')
-  // } catch (error) {
-  //   console.log(error)
-  // }
-  redirect('/actions')
-
+  try {
+    // throw new Error("something went wrong")
+    await saveUser(newUser)
+    // redirect('/')
+    revalidatePath('/actions')
+    return 'User created sucessfully'
+  } catch (error) {
+    console.log(error)
+    return 'failed to create user....'
+  }
+  // redirect('/actions')
 }
 
 export const fetchUsers = async (): Promise<User[]> => {
@@ -48,7 +55,7 @@ const saveUser = async (user: User) => {
   await writeFile('users.json', JSON.stringify(users))
 }
 
-// without revalidate path. We are simply adding the user to the array but we are not showing it on UI. 
+// without revalidate path. We are simply adding the user to the array but we are not showing it on UI.
 // Next.js is aggressive on caching nd unless we make a req those values won't get updated.
 
 // 2 options we have
