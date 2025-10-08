@@ -31,7 +31,7 @@ export const createUser = async (prevState: any, formData: FormData) => {
 
   // if you place redirect here. It will throw an error. Just place it after catch block
   try {
-    // throw new Error("something went wrong")
+    // throw new Error("something went wrong")+
     await saveUser(newUser)
     // redirect('/')
     revalidatePath('/actions')
@@ -53,6 +53,24 @@ const saveUser = async (user: User) => {
   const users = await fetchUsers()
   users.push(user)
   await writeFile('users.json', JSON.stringify(users))
+}
+
+export const deleteUser = async (formData: FormData) => {
+  const id = formData.get('id') as string
+  const users = await fetchUsers()
+  const updatedUsers = users.filter((user) => user.id !== id)
+  await writeFile('users.json', JSON.stringify(updatedUsers))
+  revalidatePath('/actions')
+}
+
+export const removeUser = async (id: string, formdata: FormData) => {
+  const name = formdata.get('name') as string
+  console.log(name)
+
+  const users = await fetchUsers()
+  const updatedUsers = users.filter((user) => user.id !== id)
+  await writeFile('users.json', JSON.stringify(updatedUsers))
+  revalidatePath('/actions')
 }
 
 // without revalidate path. We are simply adding the user to the array but we are not showing it on UI.
